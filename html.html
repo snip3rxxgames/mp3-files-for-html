@@ -1,0 +1,1105 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>CUB3: The game</title>
+<style>
+body {
+  padding: 0;
+  margin: 0;
+  box-sizing: border-box;
+  background-color: #000000;
+  font-family: Arial, sans-serif;
+}
+
+:root.dark {
+  color-scheme: dark;
+}
+
+:root.dark #main {
+  background: #994B00;
+}
+
+#screen {
+  transform-style: preserve-3d;
+  perspective: 1000px;
+  height: 100vh;
+  width: 100vw;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  overflow: hidden;
+}
+
+.ui {
+  position: fixed;
+  font-family: sans-serif;
+  z-index: 100;
+}
+
+.ui-top {
+  top: 0;
+  height: 50px;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  color: white;
+}
+
+#fps {
+  font-size: 24pt;
+  font-weight: bold;
+  margin-left: 5px;
+  float: left;
+}
+
+.camera_menu {
+  float: right;
+  margin-top: 5px;
+  position: relative;
+}
+
+.camera_menu > button:first-child {
+  display: inline-block;
+  font-size: 16pt;
+  cursor: pointer;
+  margin-right: 10px;
+}
+
+.camera_menu .dropdown-content {
+  display: none;
+  position: absolute;
+  background-color: #5a5a5a;
+  min-width: 160px;
+  box-shadow: 0px 8px 16px 0px rgba(0, 0, 0, 0.2);
+  padding: 8px 12px;
+  z-index: 1;
+  right: 0;
+  top: 100%;
+}
+
+.camera_menu .dropdown-content button {
+  display: block;
+  font-size: 14pt;
+  cursor: pointer;
+  margin-right: 0;
+  margin-top: 5px;
+  border: 1px solid #555;
+  padding: 5px 10px;
+  background-color: #000000;
+  color: #eee;
+  width: 100%;
+  box-sizing: border-box;
+  text-align: center;
+}
+
+.camera_menu .dropdown-content button:hover {
+  background-color: #666;
+}
+
+.camera_menu:hover .dropdown-content {
+  display: block;
+}
+
+#main {
+  transform: rotateX(60deg) rotateZ(0deg);
+  background: #f7a85a;
+  padding: 150px;
+  user-select: none;
+  cursor: grab;
+  transform-style: preserve-3d;
+  transition: transform 0.5s ease-in-out;
+  position: relative;
+}
+
+.box {
+  content: "";
+  position: absolute;
+  color: white;
+  font-size: 20px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  width: 100%;
+  height: 100%;
+}
+
+.box.front {
+  height: 50px;
+  width: 100%;
+  left: 0;
+  bottom: -50px;
+  transform: rotateX(-90deg);
+  transform-origin: top;
+}
+
+.box.back {
+  height: 50px;
+  width: 100%;
+  left: 0;
+  top: -150px;
+  transform: rotateX(90deg) rotate(180deg);
+  transform-origin: bottom;
+}
+
+.box.left {
+  height: 100%;
+  width: 50px;
+  left: -100px;
+  top: 0;
+  transform: rotateY(-90deg) rotate(-270deg);
+  transform-origin: right;
+}
+
+.box.right {
+  height: 100%;
+  width: 50px;
+  right: -100px;
+  top: 0;
+  transform: rotateY(90deg) rotate(-90deg);
+  transform-origin: left;
+}
+
+.row {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-content: center;
+}
+
+.block {
+  height: 100px;
+  width: 100px;
+  transition: 0.3s ease-out;
+  cursor: pointer;
+  border: 2px solid black;
+  box-sizing: border-box;
+  font-size: 0.7em;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  color: white;
+  position: relative;
+}
+
+.block:not(:empty) {
+  color: white;
+  font-size: 18px;
+  font-weight: bold;
+}
+
+.row:nth-child(odd) .block:nth-child(odd),
+.row:nth-child(even) .block:nth-child(even) {
+  background: #000000;
+}
+
+.row:nth-child(even) .block:nth-child(odd),
+.row:nth-child(odd) .block:nth-child(even) {
+  background: #333333;
+}
+
+.row:nth-child(odd) .block:nth-child(odd):hover,
+.row:nth-child(even) .block:nth-child(even):hover {
+  background: #555;
+}
+
+.row:nth-child(even) .block:nth-child(odd):hover,
+.row:nth-child(odd) .block:nth-child(even):hover {
+  background: #00ffec;
+}
+
+.dont_hover .row:nth-child(odd) .block:nth-child(odd),
+.dont_hover .row:nth-child(even) .block:nth-child(even) {
+  background: #333;
+  cursor: unset;
+}
+
+.dont_hover .row:nth-child(even) .block:nth-child(odd),
+.dont_hover .row:nth-child(odd) .block:nth-child(even) {
+  background: #333;
+  cursor: unset;
+}
+
+:root.dark .row:nth-child(even) .block:nth-child(odd),
+:root.dark .row:nth-child(odd) .block:nth-child(even) {
+  background: #007fff;
+}
+
+:root.dark .row:nth-child(even) .block:nth-child(odd):hover,
+:root.dark .row:nth-child(odd) .block:nth-child(even):hover {
+  background: #007fff;
+}
+
+:root.dark .dont_hover .row:nth-child(even) .block:nth-child(odd),
+:root.dark .dont_hover .row:nth-child(odd) .block:nth-child(even) {
+  background: #007fff;
+}
+
+.block span {
+  display: block;
+  transition: transform 0.5s ease-in-out;
+}
+
+.hidden {
+  display: none;
+}
+
+/* Gummy Bear Style - 35% smaller */
+.gummy-bear {
+  position: absolute;
+  width: 32.5px; /* 50px * 0.65 */
+  height: 39px;  /* 60px * 0.65 */
+  background-color: #7EC0EE;
+  border-radius: 50% 50% 45% 45%;
+  box-shadow: 
+    inset -5px -5px 10px rgba(0,0,0,0.2),
+    inset 5px 5px 15px rgba(255,255,255,0.3);
+  z-index: 10;
+  transition: all 0.5s ease;
+}
+
+.gummy-bear:before {
+  content: '';
+  position: absolute;
+  width: 9.75px; /* 15px * 0.65 */
+  height: 9.75px; /* 15px * 0.65 */
+  background-color: white;
+  border-radius: 50%;
+  top: 9.75px; /* 15px * 0.65 */
+  left: 6.5px; /* 10px * 0.65 */
+  opacity: 0.8;
+}
+
+.gummy-bear:after {
+  content: '';
+  position: absolute;
+  width: 9.75px; /* 15px * 0.65 */
+  height: 9.75px; /* 15px * 0.65 */
+  background-color: white;
+  border-radius: 50%;
+  top: 9.75px; /* 15px * 0.65 */
+  right: 6.5px; /* 10px * 0.65 */
+  opacity: 0.8;
+}
+
+/* Roll Button */
+#roll-button {
+  position: fixed;
+  bottom: 30px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+  background: #4CAF50;
+  color: white;
+  border: none;
+  font-size: 20px;
+  font-weight: bold;
+  cursor: pointer;
+  box-shadow: 0 4px 8px rgba(0, 255, 207, 0.3);
+  transition: all 0.2s;
+  z-index: 100;
+}
+
+#roll-button:hover {
+  background: #45a049;
+  transform: translateX(-50%) scale(1.05);
+}
+
+#roll-button:active {
+  transform: translateX(-50%) scale(0.95);
+}
+
+/* Dice Display */
+#dice-display {
+  position: fixed;
+  bottom: 150px;
+  left: 50%;
+  transform: translateX(-50%);
+  color: white;
+  font-size: 24px;
+  background: rgba(0, 255, 236, 0.7);
+  padding: 10px 20px;
+  border-radius: 10px;
+  z-index: 100;
+  display: none;
+}
+
+/* Path highlighting */
+.path-block {
+  animation: pulse 1s infinite alternate;
+}
+
+@keyframes pulse {
+  from { box-shadow: inset 0 0 10px #fff; }
+  to { box-shadow: inset 0 0 20px #ff0; }
+}
+
+/* Question Modal */
+.question-modal {
+  display: none;
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: #333;
+  padding: 20px;
+  border-radius: 10px;
+  box-shadow: 0 0 20px rgba(0, 205, 255, 0.5);
+  z-index: 1000;
+  width: 80%;
+  max-width: 500px;
+  color: white;
+}
+
+.question-modal h2 {
+  margin-top: 0;
+  color: #7EC0EE;
+}
+
+.question-select {
+  width: 100%;
+  padding: 10px;
+  margin: 10px 0;
+  font-size: 16px;
+  border-radius: 5px;
+  border: none;
+  background-color: white;
+  color: #333;
+}
+
+.submit-answer {
+  background: #4CAF50;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  font-size: 16px;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background 0.3s;
+}
+
+.submit-answer:hover {
+  background: #45a049;
+}
+
+.overlay {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 244, 255, 0.7);
+  z-index: 999;
+}
+</style>
+</head>
+<body>
+
+<div id="screen">
+  <div class="ui ui-top">
+    <span>Frames per Second --></span>
+    <div id="fps">0</div>
+    <div class="camera_menu">
+      <button>Camera</button>
+      <div class="dropdown-content">
+        <button id="reset_camera">Reset</button>
+        <button id="set_camera_front">Top-Down</button>
+        <button id="turn_left">Turn Left</button>
+        <button id="turn_right">Turn Right</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="main">
+    <div class="box front hidden">Front</div>
+    <div class="box back hidden">Back</div>
+    <div class="box left hidden">Left</div>
+    <div class="box right hidden">Right</div>
+    <!-- Game board setup -->
+    <div class="row">
+      <div class="block"><span>Special<br>Action</span></div>
+      <div class="block"><span>Random<br>Question</span></div>
+      <div class="block"><span>Random<br>Question</span></div>
+      <div class="block"><span>Random<br>Question</span></div>
+      <div class="block"><span>Random<br>Question</span></div>
+       <div class="block"><span>Random<br>Question</span></div>
+      <div class="block"><span>Random<br>Question</span></div>
+      <div class="block"><span>Random<br>Question</span></div>
+      <div class="block"><span>Random<br>Question</span></div>
+      <div class="block"><span>Random<br>Question</span></div>
+      <div class="block"><span>Free<br>Space</span></div>
+    </div>
+    <div class="row">
+      <div class="block"><span>Random<br>Question</span></div>
+      <div class="block"></div>
+      <div class="block"></div>
+      <div class="block"></div>
+      <div class="block"></div>
+      <div class="block"></div>
+      <div class="block"></div>
+      <div class="block"></div>
+      <div class="block"></div>
+      <div class="block"></div>
+      <div class="block"><span>Random<br>Question</span></div>
+    </div>
+    <div class="row">
+      <div class="block"><span>Random<br>Question</span></div>
+      <div class="block"></div>
+      <div class="block"></div>
+      <div class="block"></div>
+      <div class="block"></div>
+      <div class="block"></div>
+      <div class="block"></div>
+      <div class="block"></div>
+      <div class="block"></div>
+      <div class="block"></div>
+      <div class="block"><span>Random<br>Question</span></div>
+    </div>
+    <div class="row">
+      <div class="block"><span>Random<br>Question</span></div>
+      <div class="block"></div>
+      <div class="block"></div>
+      <div class="block"></div>
+      <div class="block"></div>
+      <div class="block"></div>
+      <div class="block"></div>
+      <div class="block"></div>
+      <div class="block"></div>
+      <div class="block"></div>
+      <div class="block"><span>Random<br>Question</span></div>
+    </div>
+    <div class="row">
+      <div class="block"><span>Random<br>Question</span></div>
+      <div class="block"></div>
+      <div class="block"></div>
+      <div class="block"></div>
+      <div class="block"></div>
+      <div class="block"></div>
+      <div class="block"></div>
+      <div class="block"></div>
+      <div class="block"></div>
+      <div class="block"></div>
+      <div class="block"><span>Random<br>Question</span></div>
+    </div>
+    <div class="row">
+       <div class="block"><span>Random<br>Question</span></div>
+      <div class="block"></div>
+      <div class="block"></div>
+      <div class="block"></div>
+      <div class="block"></div>
+      <div class="block"></div>
+      <div class="block"></div>
+      <div class="block"></div>
+      <div class="block"></div>
+      <div class="block"></div>
+       <div class="block"><span>Random<br>Question</span></div>
+    </div>
+    <div class="row">
+      <div class="block"><span>Random<br>Question</span></div>
+      <div class="block"></div>
+      <div class="block"></div>
+      <div class="block"></div>
+      <div class="block"></div>
+      <div class="block"></div>
+      <div class="block"></div>
+      <div class="block"></div>
+      <div class="block"></div>
+      <div class="block"></div>
+      <div class="block"><span>Random<br>Question</span></div>
+    </div>
+    <div class="row">
+      <div class="block"><span>Random<br>Question</span></div>
+      <div class="block"></div>
+      <div class="block"></div>
+      <div class="block"></div>
+      <div class="block"></div>
+      <div class="block"></div>
+      <div class="block"></div>
+      <div class="block"></div>
+      <div class="block"></div>
+      <div class="block"></div>
+      <div class="block"><span>Random<br>Question</span></div>
+    </div>
+    <div class="row">
+      <div class="block"><span>Random<br>Question</span></div>
+      <div class="block"></div>
+      <div class="block"></div>
+      <div class="block"></div>
+      <div class="block"></div>
+      <div class="block"></div>
+      <div class="block"></div>
+      <div class="block"></div>
+      <div class="block"></div>
+      <div class="block"></div>
+      <div class="block"><span>Random<br>Question</span></div>
+    </div>
+    <div class="row">
+      <div class="block"><span>Random<br>Question</span></div>
+      <div class="block"></div>
+      <div class="block"></div>
+      <div class="block"></div>
+      <div class="block"></div>
+      <div class="block"></div>
+      <div class="block"></div>
+      <div class="block"></div>
+      <div class="block"></div>
+      <div class="block"></div>
+      <div class="block"><span>Random<br>Question</span></div>
+    </div>
+    <div class="row">
+      <div class="block"><span>Special<br>Action</span></div>
+      <div class="block"><span>Random<br>Question</span></div>
+      <div class="block"><span>Random<br>Question</span></div>
+      <div class="block"><span>Random<br>Question</span></div>
+      <div class="block"><span>Random<br>Question</span></div>
+       <div class="block"><span>Random<br>Question</span></div>
+      <div class="block"><span>Random<br>Question</span></div>
+      <div class="block"><span>Random<br>Question</span></div>
+      <div class="block"><span>Random<br>Question</span></div>
+      <div class="block"><span>Random<br>Question</span></div>
+      <div class="block start-block"><span>Start<br>Here</span></div>
+    </div>
+  </div>
+  
+  <!-- Roll Button -->
+  <button id="roll-button">Roll</button>
+  
+  <!-- Dice Display -->
+  <div id="dice-display"></div>
+</div>
+
+<!-- Question Modal -->
+<div class="overlay" id="overlay"></div>
+<div class="question-modal" id="questionModal">
+  <h2 id="questionText">Question</h2>
+  <select class="question-select" id="answerSelect">
+    <option value="">Select an answer</option>
+  </select>
+  <button class="submit-answer" id="submitAnswer">Submit</button>
+</div>
+
+<script type="text/javascript">
+var startX, startY;
+var cameraX = cameraY = 0;
+var inclineY = 60;
+var inclineZ = 0;
+var scrollPos = 1;
+var fps_calc = 0;
+var fps_limit = 60;
+var smoothZoom = true;
+var theme = 'auto';
+
+var screen = document.querySelector("#screen");
+var main = document.querySelector("#main");
+var fps_el = document.querySelector("#fps");
+var rollButton = document.querySelector("#roll-button");
+var diceDisplay = document.querySelector("#dice-display");
+
+var frontBox = document.querySelector(".box.front");
+var backBox = document.querySelector(".box.back");
+var leftBox = document.querySelector(".box.left");
+var rightBox = document.querySelector(".box.right");
+
+// Game state
+var currentPosition = {row: 10, col: 10}; // Start position (bottom-right corner)
+var isMoving = false;
+var pathBlocks = [];
+var gummyBear = document.createElement("div");
+gummyBear.className = "gummy-bear";
+document.body.appendChild(gummyBear);
+
+// Question system - formatted as a list with dropdown options
+var questions = [
+  {
+    text: "How many faces does a cube have?",
+    options: ["4", "6", "8", "12"],
+    answer: "6"
+  },
+  {
+    text: "How many edges does a triangular prism have?",
+    options: ["9", "6", "8", "12"],
+    answer: "9"
+  },
+  {
+    text: "How many vertices does a square pyramid have?",
+    options: ["4", "5", "6", "8"],
+    answer: "5"
+  },
+  {
+    text: "Which shape has only one curved surface and no vertices?",
+    options: ["Sphere", "Cone", "Cylinder", "Cube"],
+    answer: "Sphere"
+  },
+  {
+    text: "What 2D shape has four equal sides and four right angles?",
+    options: ["Rhombus", "Rectangle", "Square", "Parallelogram"],
+    answer: "Square"
+  },
+  {
+    text: "How many sides does a regular hexagon have?",
+    options: ["5", "6", "7", "8"],
+    answer: "6"
+  },
+  {
+    text: "Which 3D shape has 6 faces, all rectangles?",
+    options: ["Cube", "Cuboid", "Pyramid", "Tetrahedron"],
+    answer: "Cuboid"
+  },
+  {
+    text: "How many edges does a cylinder have?",
+    options: ["0", "1", "2", "3"],
+    answer: "2"
+  },
+  {
+    text: "What is the name of a 3D shape with a circular base and a single vertex?",
+    options: ["Cylinder", "Sphere", "Cone", "Cube"],
+    answer: "Cone"
+  },
+  {
+    text: "Which 2D shape has three sides?",
+    options: ["Square", "Hexagon", "Triangle", "Pentagon"],
+    answer: "Triangle"
+  },
+  {
+    text: "Which shape has no edges or vertices?",
+    options: ["Cone", "Cylinder", "Sphere", "Cube"],
+    answer: "Sphere"
+  },
+  {
+    text: "What do you call a triangle with all sides equal?",
+    options: ["Isosceles", "Scalene", "Equilateral", "Right"],
+    answer: "Equilateral"
+  },
+  {
+    text: "How many faces does a rectangular prism have?",
+    options: ["4", "5", "6", "8"],
+    answer: "6"
+  },
+  {
+    text: "How many sides does a decagon have?",
+    options: ["8", "9", "10", "12"],
+    answer: "10"
+  },
+  {
+    text: "What is the base shape of a cylinder?",
+    options: ["Circle", "Rectangle", "Square", "Oval"],
+    answer: "Circle"
+  },
+  {
+    text: "Which shape is a 3D version of a triangle?",
+    options: ["Tetrahedron", "Cone", "Prism", "Sphere"],
+    answer: "Tetrahedron"
+  },
+  {
+    text: "How many edges does a cube have?",
+    options: ["8", "10", "12", "14"],
+    answer: "12"
+  },
+  {
+    text: "How many faces does a triangular prism have?",
+    options: ["4", "5", "6", "8"],
+    answer: "5"
+  },
+  {
+    text: "Which shape has two parallel circular bases?",
+    options: ["Cone", "Sphere", "Cylinder", "Pyramid"],
+    answer: "Cylinder"
+  },
+  {
+    text: "What is the name of a shape with eight sides?",
+    options: ["Hexagon", "Heptagon", "Octagon", "Nonagon"],
+    answer: "Octagon"
+  }
+];
+
+// DOM elements for question system
+var overlay = document.getElementById("overlay");
+var questionModal = document.getElementById("questionModal");
+var questionText = document.getElementById("questionText");
+var answerSelect = document.getElementById("answerSelect");
+var submitAnswer = document.getElementById("submitAnswer");
+
+// Initialize gummy bear position
+positionGummyBear();
+
+calc_fps()
+updateCamera()
+updateSideVisibility();
+
+var mouseDown = false;
+var ctrlDown = false;
+
+if (theme == "auto"){
+  let darkThemeMq = window.matchMedia("(prefers-color-scheme: dark)").matches
+  if (darkThemeMq) {
+    theme = "dark"
+  }
+}
+
+if (theme == "dark"){
+  document.documentElement.classList.add(theme);
+}
+
+window.addEventListener("contextmenu", e => e.preventDefault());
+
+window.onkeydown = (e)=>{
+  if (e.keyCode == 17) ctrlDown = true
+}
+
+window.onkeyup = (e)=>{
+  if (e.keyCode == 17) ctrlDown = false
+}
+
+screen.onmousedown = (e)=>{
+  screen.style.cursor = "grabbing"
+  main.style.cursor = "grabbing"
+  main.classList.add("dont_hover")
+  mouseDown = true;
+  startX = e.clientX;
+  startY = e.clientY;
+}
+
+screen.onmouseup = (e)=>{
+  screen.style.cursor = ""
+  main.style.cursor = "grab"
+  main.classList.remove("dont_hover")
+  mouseDown = false;
+}
+
+var blockUpdates = false;
+screen.onmousemove = (e)=>{
+  if(mouseDown === true){
+    if (!blockUpdates){
+      blockUpdates = true;
+      if (smoothZoom){
+        if (scrollInterval){
+          clearTimeout(scrollInterval)
+          main.style.transition = "0.1s ease"
+          scrollInterval = setTimeout(()=>{main.style.transition = ""},100)
+        }
+      }
+
+      let tempX = e.clientX - startX;
+      let tempY = e.clientY - startY;
+
+      if (ctrlDown){
+        tempX = tempX/10;
+        tempY = tempY/10;
+        inclineZ = inclineZ - tempX;
+        inclineY = Math.max(Math.min(inclineY - tempY, 85) , 0);
+      } else{
+        cameraX += tempX * Math.cos(-inclineZ * Math.PI / 180) - tempY * Math.sin(-inclineZ * Math.PI / 180)
+        cameraY += tempX * Math.sin(-inclineZ * Math.PI / 180) + tempY * Math.cos(-inclineZ * Math.PI / 180)
+      }
+
+      startX = e.clientX;
+      startY = e.clientY;
+      updateCamera()
+
+      setTimeout(()=>{blockUpdates = false;}, 1000/60)
+    }
+  }
+}
+
+var scrollInterval;
+screen.onwheel = (e)=>{
+  if (smoothZoom){
+    if (scrollInterval) clearTimeout(scrollInterval);
+    main.style.transition = "0.2s ease"
+  }
+
+  let tempscroll = parseInt(e.deltaY)/2000
+  scrollPos = Math.min( Math.max(scrollPos - tempscroll, 0.5) , 2);
+  updateCamera()
+
+  if (smoothZoom){
+    scrollInterval = setTimeout(_=>{
+      main.style.transition = ""
+    }, 200)
+  }
+}
+
+function updateCamera(){
+  fps_calc += 1
+  main.style.transform = `rotateX(${inclineY}deg) rotateZ(${inclineZ}deg) translate(${cameraX}px, ${cameraY}px) scale(${scrollPos})`;
+  updateSideVisibility();
+  positionGummyBear(); // Update gummy bear position when camera moves
+}
+
+function calc_fps() {
+  fps_el.innerHTML = fps_calc;
+  fps_calc = 0;
+  setTimeout(calc_fps, 1000)
+}
+
+var camera_animation;
+document.querySelector("#reset_camera").onclick = function() {
+  if (camera_animation) clearTimeout(camera_animation);
+  main.style.transition = "1s ease"
+  cameraX = cameraY = 0;
+  inclineY = 60;
+  inclineZ = 0;
+  scrollPos = 1;
+  updateCamera()
+  camera_animation = setTimeout(_=>{
+    main.style.transition = ""
+  }, 1000)
+}
+
+document.querySelector("#set_camera_front").onclick = function() {
+  if (camera_animation) clearTimeout(camera_animation);
+  main.style.transition = "1s ease"
+  cameraX = cameraY = 0;
+  inclineY = 0;
+  inclineZ = 0;
+  scrollPos = 0.8;
+  updateCamera()
+  camera_animation = setTimeout(_=>{
+    main.style.transition = ""
+  }, 1000)
+}
+
+document.querySelector("#turn_left").onclick = function() {
+    main.style.transition = "transform 0.5s ease-in-out";
+    inclineZ -= 90;
+    updateCamera();
+    updateTextOrientation();
+}
+
+document.querySelector("#turn_right").onclick = function() {
+    main.style.transition = "transform 0.5s ease-in-out";
+    inclineZ += 90;
+    updateCamera();
+    updateTextOrientation();
+}
+
+function updateTextOrientation() {
+    const blocks = document.querySelectorAll(".block span");
+    blocks.forEach(block => {
+        block.style.transform = `rotate(${-inclineZ}deg)`;
+    });
+}
+
+function updateSideVisibility() {
+  let normalizedInclineZ = inclineZ % 360;
+  if (normalizedInclineZ < 0) {
+    normalizedInclineZ += 360;
+  }
+
+  frontBox.classList.add("hidden");
+  backBox.classList.add("hidden");
+  leftBox.classList.add("hidden");
+  rightBox.classList.add("hidden");
+
+  if (normalizedInclineZ >= 315 || normalizedInclineZ < 45) {
+    frontBox.classList.remove("hidden");
+  } else if (normalizedInclineZ >= 45 && normalizedInclineZ < 135) {
+    rightBox.classList.remove("hidden");
+  } else if (normalizedInclineZ >= 135 && normalizedInclineZ < 225) {
+    backBox.classList.remove("hidden");
+  } else {
+    leftBox.classList.remove("hidden");
+  }
+}
+
+// Position the gummy bear in the center of its current block
+function positionGummyBear() {
+  const rows = document.querySelectorAll(".row");
+  if (rows.length > currentPosition.row) {
+    const row = rows[currentPosition.row];
+    const blocks = row.querySelectorAll(".block");
+    if (blocks.length > currentPosition.col) {
+      const block = blocks[currentPosition.col];
+      const rect = block.getBoundingClientRect();
+      
+      // Adjusted for 35% smaller size (32.5px width, 39px height)
+      gummyBear.style.left = `${rect.left + rect.width/2 - 16.25}px`;
+      gummyBear.style.top = `${rect.top + rect.height/2 - 19.5}px`;
+    }
+  }
+}
+
+// Get all blocks on the outer path in the correct clockwise order
+function getPathBlocks() {
+  const path = [];
+  const rows = document.querySelectorAll(".row");
+  const numRows = rows.length;
+  const numCols = rows[0].children.length;
+  
+  // Start from current position
+  let row = currentPosition.row;
+  let col = currentPosition.col;
+  
+  // 1. Move left along current row until first column
+  while (col > 0) {
+    col--;
+    path.push({row: row, col: col, block: rows[row].children[col]});
+  }
+  
+  // 2. Move up left column until first row
+  while (row > 0) {
+    row--;
+    path.push({row: row, col: col, block: rows[row].children[col]});
+  }
+  
+  // 3. Move right along top row until last column
+  while (col < numCols - 1) {
+    col++;
+    path.push({row: row, col: col, block: rows[row].children[col]});
+  }
+  
+  // 4. Move down right column until last row
+  while (row < numRows - 1) {
+    row++;
+    path.push({row: row, col: col, block: rows[row].children[col]});
+  }
+  
+  // 5. Move left along bottom row until start position column
+  while (col > currentPosition.col) {
+    col--;
+    path.push({row: row, col: col, block: rows[row].children[col]});
+  }
+  
+  return path;
+}
+// Show random question
+function showRandomQuestion() {
+  const randomIndex = Math.floor(Math.random() * questions.length);
+  const question = questions[randomIndex];
+
+  questionText.textContent = question.text;
+
+  // Clear previous options
+  answerSelect.innerHTML = '<option value="">Select an answer</option>';
+
+  // Add new options
+  question.options.forEach((option) => {
+    const optionElement = document.createElement("option");
+    optionElement.value = option;
+    optionElement.textContent = option;
+    answerSelect.appendChild(optionElement);
+  });
+
+  overlay.style.display = "block";
+  questionModal.style.display = "block";
+  answerSelect.focus();
+}
+// Handle answer submission
+submitAnswer.addEventListener("click", function() {
+  const currentQuestion = questions.find(q => q.text === questionText.textContent);
+  
+  if (answerSelect.value === currentQuestion.answer) {
+    alert("Correct answer!");
+  } else {
+    alert(`Wrong answer! The correct answer was ${currentQuestion.answer}`);
+  }
+  
+  overlay.style.display = "none";
+  questionModal.style.display = "none";
+});
+
+// Allow Enter key to submit answer
+answerSelect.addEventListener("keypress", function(e) {
+  if (e.key === "Enter") {
+    submitAnswer.click();
+  }
+});
+
+// Close modal when clicking overlay
+overlay.addEventListener("click", function() {
+  overlay.style.display = "none";
+  questionModal.style.display = "none";
+});
+
+// Roll dice and move the gummy bear
+rollButton.addEventListener("click", function () {
+  if (isMoving) return;
+
+  diceDisplay.style.display = "block";
+  diceDisplay.textContent = "Rolling...";
+  rollButton.disabled = true;
+
+  setTimeout(function () {
+    const roll = Math.floor(Math.random() * 6) + 1; // Simulate dice roll (1-6)
+    diceDisplay.textContent = `You rolled a ${roll}!`;
+
+    const path = getPathBlocks();
+    moveGummyBear(path, roll);
+
+    setTimeout(function () {
+      diceDisplay.style.display = "none"; // Hide roll display after a delay
+    }, 2000);
+  }, 1000);
+});
+    
+// Move the gummy bear along the path
+function moveGummyBear(path, stepsRemaining) {
+  if (stepsRemaining <= 0) {
+    isMoving = false;
+    rollButton.disabled = false;
+
+    // Show random question when landing
+    showRandomQuestion(); // Always show a question after movement
+    return;
+  }
+
+  isMoving = true;
+
+  // Find current position in path
+  let currentIndex = path.findIndex(
+    (p) => p.row === currentPosition.row && p.col === currentPosition.col
+  );
+
+  // If not found, start from the beginning
+  if (currentIndex === -1) currentIndex = 0;
+
+  const nextIndex = (currentIndex + 1) % path.length;
+  const nextPos = path[nextIndex];
+
+  // Highlight next block
+  path.forEach((b) => b.block.classList.remove("path-block"));
+  nextPos.block.classList.add("path-block");
+
+  // Animate movement
+  const nextBlock = nextPos.block;
+  const rect = nextBlock.getBoundingClientRect();
+
+  gummyBear.style.transition = "all 0.5s ease";
+  // Adjusted for 35% smaller size (32.5px width, 39px height)
+  gummyBear.style.left = `${rect.left + rect.width / 2 - 16.25}px`;
+  gummyBear.style.top = `${rect.top + rect.height / 2 - 19.5}px`;
+
+  // Update position after animation completes
+  setTimeout(function () {
+    currentPosition = { row: nextPos.row, col: nextPos.col };
+    moveGummyBear(path, stepsRemaining - 1);
+  }, 500);
+}
+
+// Handle window resize
+window.addEventListener("resize", positionGummyBear);
+</script>
+  <audio id="backgroundMusic" loop>
+    <source src="https://raw.githubusercontent.com/snip3rxxgames/mp3-files-for-html/main/break-in-story.mp3" type="audio/mpeg">
+  </audio>
+  
+  <script>
+    // Play music after page loads
+    window.onload = function() {
+      const music = document.getElementById('backgroundMusic');
+      music.volume = 0.3; // 30% volume
+      
+      // Many browsers require user interaction before playing audio
+      document.addEventListener('click', function initAudio() {
+        music.play().catch(e => console.log("Audio play failed:", e));
+        document.removeEventListener('click', initAudio);
+      }, { once: true });
+    };
+  </script>
+</body>
+</html>
