@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Stellar Lite</title>
+    <link rel="icon" type="image/x-icon" href="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSYK9WYlR_6uAgABmOT41WYDIXi6C3SzbkUffeFp0Gr-wRHCaITVHh-6oIA92Fp6J_4EOQ&usqp=CAU">
+    <style>
+        body {
+            background-color: black;
+            overflow: hidden;
+            color: white;
+             font-family: -apple-system, BlinkMacSystemFont, ;
+            margin: 0;
+            padding: 0;
+        }
+       html, body {
+  height: 100%;
+  margin: 0;
+  overflow-x: hidden; /* Hides horizontal scrollbar */
+  overflow-y: auto; /* Enables vertical scrolling */
+}
+
+.container {
+  max-width: 100vw; /* Prevents content from overflowing horizontally */
+  overflow-y: auto; /* Adds vertical scrolling if needed */
+}
+        .stars {
+            width: 100%;
+            height: 100%;
+            position: absolute;
+            top: 0;
+            left: 0;
+            pointer-events: none;
+            z-index: 1;
+        }
+        .star {
+            position: absolute;
+            width: 2px;
+            height: 2px;
+            background: white;
+            border-radius: 50%;
+        }
+        nav {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            display: flex;
+            gap: 20px;
+            z-index: 2;
+        }
+        nav a {
+            color: white;
+            text-decoration: none;
+            font-size: 24px;
+            transition: transform 0.3s ease;
+        }
+        nav a:hover {
+            transform: scale(1.4);
+        }
+        h1 {
+            font-size: 4rem;
+            text-align: center;
+            margin: 80px 0;
+            color: white;
+            z-index: 2;
+        }
+        .search-bar {
+            border: 10px solid darkblue;
+            padding: 10px;
+            font-size: 20px;
+            width: 50%;
+            margin: 0 auto;
+            display: block;
+            z-index: 2;
+        }
+        .games-container {
+            display: none;
+            padding: 20px;
+            z-index: 2;
+        }
+        .game {
+            display: inline-block;
+            background-color: #000000; /* Changed to black */
+            border-radius: 10px;
+            padding: 20px;
+            margin: 10px;
+            text-align: center;
+            transition: background-color 0.3s ease;
+            cursor: pointer;
+            z-index: 2;
+        }
+        .game img {
+            width: 160px;
+            height: 160px;
+        }
+         .game:hover {
+            background-color: #00ffec;
+        }
+        .game-title {
+            margin-top: 10px;
+            color: white;
+            transition: color 0.3s ease;
+        }
+        .fullscreen-iframe {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            border: none;
+            display: none;
+            z-index: 3;
+        }
+        footer {
+  
+}
+    </style>
+</head>
+<body>
+    <div class="stars"></div>
+    <nav>
+        <a href="#home" onclick="showHome()">Home</a>
+        <a href="#games" onclick="showGames()">Games</a>
+    </nav>
+    <h1>Stellar Lite</h1>
+    <input type="text" class="search-bar" id="search-bar" placeholder="Search the site" onkeyup="searchSite()" />
+    <div class="games-container" id="games-container">
+        <div class="game" data-title="1v1.lol" onclick="openGame('https://sz-games.github.io/Games-2/lol/')">
+            <img src="https://slope-unblocked.lol/premium-webp/1.webp" alt="1v1.lol">
+            <div class="game-title">1v1.lol</div>
+        </div>
+        <div class="game" data-title="1v1.lol v2" onclick="openGame('https://professorlouie.github.io/gamehub/basketrandom/')">
+            <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcT3xJr7XDLuzlBex6laI1ePN_Zb-KwHMq1mgjIyLtuqX2M8KfgbBHylVI6VPx_QMSkZLbc&usqp=CAU" alt="1v1.lol v2">
+            <div class="game-title">1v1.lol v2</div>
+        </div>
+        <div class="game" data-title="Survival Race" onclick="openGame('https://hek-opensocial.googleusercontent.com/gadgets/ifr?url=https://groups.google.com/u/6/group/xd74b-53s-6/attach/3ab53c24b4877/1.xml?part=0.1&view=1&authuser=6&container=ig')">
+            <img src="https://static.playhop.com/images/6b333_10152950_72400/43733da75/2a0000018d6531c5_ab75f38/c73297bf3ca5d60b5b29_66c4e1/pjpg128x128" alt="Survival Race">
+            <div class="game-title">Survival Race</div>
+        </div>
+         <div class="game" data-title="Gunspin" onclick="openGame('https://seh-opensocial.googleusercontent.com/gadgets/ifr?url=https://groups.google.com/u/6/group/docs-classroom-s/attach/c3200447c710/looooo.xml?part=0.1&view=1&authuser=6&container=ig')">
+            <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSmKFbtu-W25wAcqDbF9-RvzByfUSl5Pq2bJ19LpWSzw6Zizax34h43oQTqLpPSKtm5yYQ&usqp=CAU" alt="Gunspin">
+            <div class="game-title">Gunspin</div>
+        </div>
+        <div class="game" data-title="Basket Random" onclick="openGame('https://clast5sroom-opensocial.googleusercontent.com/gadgets/ifr?url=https://groups.google.com/u/6/group/docs-classroom-s/attach/1f887c9f8832c/godfgld46d46odfgldgoxxx-google-net-x46x46oxlssaawr467.xml?part=0.1&view=1&authuser=6&container=ig')">
+            <img src="https://images.igdb.com/igdb/image/upload/t_cover_big_2x/co4ul2.jpg" alt="Basket Random">
+            <div class="game-title">Basket Random</div>
+        </div>
+        <div class="game" data-title="Sniper Shot" onclick="openGame('https://classroom-opensocial.googleusercontent.com/gadgets/ifr?url=https://groups.google.com/u/6/group/54r7m5resdndren65dx/attach/a0cff9d0cea48/634dxx.xml?part=0.1&view=1&authuser=6&container=ig')">
+            <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRJXNuTPZ9N1boD8791d6aXXQaW08nEL-iDXtNlpMEnEtV0cV9dSWUKrcTnN6Yylmaf_aw&usqp=CAU" alt="Sniper Shot">
+            <div class="game-title">Sniper Shot</div>
+        </div>
+        <div class="game" data-title="Funny Shooter 2" onclick="openGame('https://imaages-opensocial.googleusercontent.com/gadgets/ifr?url=https://cdn.jsdelivr.net/gh/wergboy/Meteor@d87e93d22ba8b6b17617bc7bd631d5a78f210098/examples/react-in-blaze/fs2.xml&container=ig')">
+            <img src="https://images.crazygames.com/funny-shooter-2_16x9/20241113090815/funny-shooter-2_16x9-cover?auto=format,compress&q=75&cs=strip" alt="FUnny Shooter">
+            <div class="game-title">Funny Shooter 2</div>
+        </div>
+        <div class="game" data-title="Unlyup Obby" onclick="openGame('https://imgjges-opensocial.googleusercontent.com/gadgets/ifr?container=ig&url=https://s3.amazonaws.com/production-assetsbucket-8ljvyr1xczmb/9ecda005-11e9-4b52-ab9e-700b4d46d00f/obby.xml')">
+            <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcT8_qk3KL2DnuVvxpoFjNmHb9yoxvEomREabAdLz_QsukQ5CvQsdZicso2iln9hHGVSaKg&usqp=CAU" alt="Unlyup Obby">
+            <div class="game-title">Only up Obby</div>
+        </div>
+        <div class="game" data-title="CS 1.6" onclick="openGame('https://classroom-opensocial.googleusercontent.com/gadgets/ifr?url=https://groups.google.com/u/6/group/54r7m5resdndren65dx/attach/2f1b7ed83bb6/google.xml?part=0.1&view=1&authuser=6&container=ig')">
+            <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcT6mJE7UAS-MhRGnfUk5SkfYs6hbIvZx-HUoohSaN2taLICh37AED9nQdbX5rfqXJr0lOc&usqp=CAU" alt="CS 1.6">
+            <div class="game-title">CS 1.6</div>
+        </div>
+        <div class="game" data-title="Glass Bridge" onclick="openGame('https://images-opensocial.googleusercontent.com/gadgets/ifr?url=https://groups.google.com/u/6/group/54r7m5resdndren65dx/attach/a2035aa6904bc/obbb.xml?part=0.1&view=1&authuser=6&container=ig')">
+            <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSGkYfPmNgbozHugkXVn907-ESxZ1aq2_swjj3FwXlhJrxLmHfImZSjSZoO-aN9kYAAn1s&usqp=CAU" alt="Glass Bridge">
+            <div class="game-title">Glass Bridge</div>
+        </div>
+        <div class="game" data-title="Zombie Road" onclick="openGame('https://teaczst-opensocial.googleusercontent.com/gadgets/ifr?url=https://groups.google.com/u/2/group/a-schools-7-x7/attach/fc6920d0036b3/yyyy.xml?part=0.1&view=1&authuser=2&container=ig')">
+            <img src="https://img.utdstc.com/icon/fe7/35e/fe735e7eea1472d88e0540ee8285106ae879fea41b997762250f54ae828f9e83:200" alt="Zombie Road">
+            <div class="game-title">Zombie Road</div>
+        </div>
+        <div class="game" data-title="Pixel Shooter" onclick="openGame('https://google-opensocial.googleusercontent.com/gadgets/ifr?url=https://googleusercontent.b-cdn.net/pixel-shooter/ps.xml&container=ig')">
+            <img src="https://images.crazygames.com/pixel-shooter/20220211101400/pixel-shooter-cover?auto=format,compress&q=75&cs=strip" alt="Pixel Shooter">
+            <div class="game-title">Pixel Shooter</div>
+        </div>
+        <div class="game" data-title="Chicken War" onclick="openGame('https://classroom-opensocial.googleusercontent.com/gadgets/ifr?url=https://cdn.jsdelivr.net/gh/SternyFahizh/RabbitMQ@c56f8a7010e08cba0d629ec7b5570abe2579b0dc/configs%252Frabbitmq/ce.xml&container=ig')">
+            <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSwFgWbSO61dXkPSJwF3Y6Qbm2YTE1ASmz8AHZKdDDRRmeJZjIpdTxGnzavqoDij2haR_U&usqp=CAU" alt="Chicken War">
+            <div class="game-title">Chicken War</div>
+        </div>
+        <div class="game" data-title="Time Shooter 3" onclick="openGame('https://classroom-opensocial.googleusercontent.com/gadgets/ifr?url=https://groups.google.com/u/6/group/54r7m5resdndren65dx/attach/59d41d61a91b0/ts64.xml?part=0.1&view=1&authuser=6&container=ig')">
+            <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRFWgINF1iqXW4JoA1aWCY_cgB8p2z_uESIE4BbHt6qMbqT6nPT2cupQj-DAv-jIhETqVs&usqp=CAU" alt="Time Shooter 3">
+            <div class="game-title">Time Shooter 3</div>
+        </div>
+        <div class="game" data-title="Cookie Clicker" onclick="openGame('https://cookieclickerunblocked.github.io/games/cookie-clicker/index.html')">
+            <img src="https://e7.pngegg.com/pngimages/622/427/png-clipart-cookie-clicker-clicker-heroes-peanut-butter-cookie-biscuits-chocolate-chip-cookie-others-miscellaneous-baked-goods-thumbnail.png" alt="Cookie Clicker">
+            <div class="game-title">Cookie Clicker</div>
+        </div>
+        <div class="game" data-title="Ragdoll Archers" onclick="openGame('https://6fvystqx-opensocial.googleusercontent.com/gadgets/ifr?url=https://groups.google.com/u/2/group/smemela-classes/attach/ded58859e44ce/1.xml?part=0.1&view=1&authuser=2&container=ig')">
+            <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSvd5EsFTWXXYJyEYo2okLedZSHyFjQh1regLTkpVpvQ-T03je1WmJz8wVmC15Ku3amjEc&usqp=CAU" alt="Ragdoll Archers">
+            <div class="game-title">Ragdoll Archers</div>
+        </div>
+        <div class="game" data-title="Dunk Shot" onclick="openGame('https://s6jf3nx0gk1d6n-opensocial.googleusercontent.com/gadgets/ifr?url=https://274539104-375910364482639571.preview.editmysite.com/uploads/b/139890129-908503369318119606/files/ds.xml&container=ig')">
+            <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRBzB-QaXEQBr_C0c40GfhHY27naEN9UmgqBu-Rt9h3j3cgcsMzMcfTllhZHC4T20msCHw&usqp=CAU" alt="Dunk Shot">
+            <div class="game-title">Dunk Shot</div>
+        </div>
+         <div class="game" data-title="Geometry Dash" onclick="openGame('https://nowgg.lol/apps/robtop-games/1400/geometry-dash.html')">
+            <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTSlpqHPCY1_UZuzgc94m96T0blF4uwyxletht53QIb7PR5AmUelcqRcv33QvFtiQ05ffM&usqp=CAU" alt="Geometry Dash">
+            <div class="game-title">Geometry Dash</div>
+        </div>
+        <div class="game" data-title="Drive Mad" onclick="openGame('https://ubg365.github.io/drive-mad/play.html')">
+            <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRSpOIZnHkuNAy8WZNebZOu_O-vIDzzBU-WMGt3mWTWBm8wNh_HpIRXuMXVVx6oRlSbnvg&usqp=CAU" alt="Drive Mad">
+            <div class="game-title">Drive Mad</div>
+        </div>
+        <div class="game" data-title="Retro Bowl" onclick="openGame('https://loserboysonyt.github.io/')">
+            <img src="https://play-lh.googleusercontent.com/-BT8C-1UPYWouyjVvWYgaar_-xV4IQvX4Bvib3koGEGiy6UsHlt0RgYpUrdTDfC2y0ct=w240-h480-rw" alt="Retro Bowl">
+            <div class="game-title">Retro Bowl</div>
+        </div>
+        <div class="game" data-title="Fortnite Item Shop" onclick="openGame('https://www.fortnite.com/item-shop?lang=en-US')">
+            <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTaZUVGnj7N9V-LrIfJyMm_Tz8g7zLk05hk0UFKIeTggQqSSsiqS9QopUdDo9VDTmBnUsA&usqp=CAU" alt="Fortnite Item Shop">
+            <div class="game-title">Fortnite Item Shop</div>
+            <div>
+<style>
+  .button-section {
+    position: absolute;
+    top: 60%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    text-align: center;
+  }
+
+  button {
+    margin: 5px;
+    padding: 10px 15px;
+    border: none;
+    background-color: #007bff;
+    color: white;
+    font-size: 16px;
+    border-radius: 5px;
+    cursor: pointer;
+  }
+
+  button:hover {
+    background-color: #0056b3;
+  }
+</style>
+       
+    </div>
+    <iframe id="game-iframe" class="fullscreen-iframe"></iframe>
+    <script>
+        function createStars() {
+            const starsContainer = document.querySelector(".stars");
+            for (let i = 0; i < 100; i++) {
+                const star = document.createElement("div");
+                star.classList.add("star");
+                star.style.top = `${Math.random() * window.innerHeight}px`;
+                star.style.left = `${Math.random() * window.innerWidth}px`;
+                star.dataset.dx = Math.random() * 4 - 2; // Increased speed
+                star.dataset.dy = Math.random() * 4 - 2; // Increased speed
+                starsContainer.appendChild(star);
+            }
+        }
+
+        function moveStars() {
+            const stars = document.querySelectorAll(".star");
+            stars.forEach((star) => {
+                let dx = parseFloat(star.dataset.dx);
+                let dy = parseFloat(star.dataset.dy);
+                let top = parseFloat(star.style.top) + dy;
+                let left = parseFloat(star.style.left) + dx;
+                if (top < 0) top = window.innerHeight;
+                if (left < 0) left = window.innerWidth;
+                if (top > window.innerHeight) top = 0;
+                if (left > window.innerWidth) left = 0;
+                star.style.top = `${top}px`;
+                star.style.left = `${left}px`;
+            });
+        }
+
+        function showGames() {
+            document.getElementById("games-container").style.display = "block";
+            document.getElementById("search-bar").style.display = "none";
+        }
+
+        function hideGames() {
+            document.getElementById("games-container").style.display = "none";
+            document.getElementById("search-bar").style.display = "none";
+        }
+
+        function showHome() {
+            document.getElementById("games-container").style.display = "none";
+            document.getElementById("search-bar").style.display = "block";
+        }
+
+        function openGame(url) {
+            const gamesContainer = document.getElementById("games-container");
+            gamesContainer.style.display = "none";
+            const iframe = document.getElementById("game-iframe");
+            iframe.src = url;
+            iframe.style.display = "block";
+        }
+
+        function searchSite() {
+            const query = document.getElementById('search-bar').value.toLowerCase();
+            const gamesContainer = document.getElementById('games-container');
+            const games = document.querySelectorAll('.game');
+            let hasResult = false;
+
+            games.forEach(game => {
+                const title = game.dataset.title.toLowerCase();
+                if (title.includes(query)) {
+                    game.style.display = 'inline-block';
+                    hasResult = true;
+                } else {
+                    game.style.display = 'none';
+                }
+            });
+
+            if (query === '' || !hasResult) {
+                gamesContainer.style.display = 'none';
+            } else {
+                gamesContainer.style.display = 'block';
+            }
+        }
+
+        createStars();
+        setInterval(moveStars, 30); // Adjust interval as needed for speed
+   
+    </script>
+    
+</body>
+    <style>
+        .oval {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 200px;
+            height: 40px;
+            background-color: black;
+            border: 4px solid white;
+            border-radius: 32px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 20px;
+            font-weight: bold;
+            color: white;
+            z-index: 9999; /* Ensures it's on top of everything */
+        }
+    </style>
+<body>
+
+    <div class="oval">Stellar Lite</div>
+
+</body>
+</html>
