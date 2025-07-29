@@ -1,0 +1,2 @@
+Name: Forest Wars
+Mechanics: Cave entrance where animals come in and go out, at one end of a square colect area that is light blue. When one animal goes in, another comes out. Animals have timers, and the rarer they are, the less time they stay in the collect area. Here are 
